@@ -42,7 +42,7 @@ export default function Invoices() {
   const fetchInvoices = async () => {
     try {
       const { data } = await axios.get(
-        "https://core-sphere-backend.vercel.app/api/invoices/getInvoices"
+        "http://localhost:5000/api/invoices/getInvoices"
       );
       if (data.success) setInvoices(data.invoices);
     } catch (error) {
@@ -55,7 +55,7 @@ export default function Invoices() {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "https://core-sphere-backend.vercel.app/api/invoices/addInvoice",
+        "http://localhost:5000/api/invoices/addInvoice",
         invoiceData
       );
       if (data.success) {
@@ -72,7 +72,7 @@ export default function Invoices() {
     e.preventDefault();
     try {
       const { data } = await axios.put(
-        `https://core-sphere-backend.vercel.app/api/invoices/updateInvoice/${selectedInvoice._id}`,
+        `http://localhost:5000/api/invoices/updateInvoice/${selectedInvoice._id}`,
         invoiceData
       );
       if (data.success) {
@@ -91,7 +91,7 @@ export default function Invoices() {
     if (!window.confirm("Are you sure you want to delete this invoice?")) return;
     try {
       const { data } = await axios.delete(
-        `https://core-sphere-backend.vercel.app/api/invoices/deleteInvoice/${id}`
+        `http://localhost:5000/api/invoices/deleteInvoice/${id}`
       );
       if (data.success) {
         setInvoices((prev) => prev.filter((inv) => inv._id !== id));

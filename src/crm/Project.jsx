@@ -11,7 +11,7 @@ import {
 } from "react-icons/fi";
 
 export default function CRMProjects() {
-  const API_URL = "https://core-sphere-backend.vercel.app/Project"; // your backend endpoint
+  const API_URL = "http://localhost:5000/Project"; // your backend endpoint
 
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 
 export default function Clients() {
-  const API_URL = "https://core-sphere-backend.vercel.app/api/leads";
+  const API_URL = "http://localhost:5000/api/leads";
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

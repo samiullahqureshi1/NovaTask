@@ -17,7 +17,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export default function ProposalsDeals() {
-  const API_URL = "https://core-sphere-backend.vercel.app/api/leads";
+  const API_URL = "http://localhost:5000/api/leads";
 
   const [columns, setColumns] = useState({
     proposals: [],
