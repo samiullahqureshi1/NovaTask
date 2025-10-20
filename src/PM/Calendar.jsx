@@ -12,7 +12,7 @@ import {
 import dayjs from "dayjs";
 
 export default function Calendar() {
-  const [activeTab, setActiveTab] = useState("calendar"); // 'calendar' | 'events'
+  const [activeTab, setActiveTab] = useState("calendar"); 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const today = dayjs();

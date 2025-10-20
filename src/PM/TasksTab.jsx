@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FaTrash } from "react-icons/fa";
 
 export default function Tasks() {
   const [search, setSearch] = useState("");
@@ -24,6 +25,8 @@ export default function Tasks() {
   const [showSubtaskEmpModal, setShowSubtaskEmpModal] = useState(false);
   const [activeSubtaskIndex, setActiveSubtaskIndex] = useState(null);
   const [selectedSubtaskEmployees, setSelectedSubtaskEmployees] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
   // Dummy Data
   const [tasks, setTasks] = useState([]);
 
@@ -37,7 +40,7 @@ export default function Tasks() {
         );
         if (data.success) setProjects(data.projects);
       } catch (err) {
-        console.error("❌ Error loading projects:", err);
+        console.error(" Error loading projects:", err);
       }
     };
     fetchProjects();
@@ -90,7 +93,7 @@ export default function Tasks() {
         );
         if (data.success) setEmployees(data.employees);
       } catch (err) {
-        console.error("❌ Error fetching employees:", err);
+        console.error(" Error fetching employees:", err);
       }
     };
 
@@ -173,7 +176,7 @@ export default function Tasks() {
         toast.error(data.message || "Operation failed", { id: "taskAction" });
       }
     } catch (error) {
-      console.error("❌ Error submitting task:", error);
+      console.error(" Error submitting task:", error);
       toast.error("Server error while saving task", { id: "taskAction" });
     }
   };
@@ -326,9 +329,21 @@ export default function Tasks() {
                             setSelectedDocs([]);
                           }
                         }}
-                        className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition p-4 space-y-3 cursor-pointer"
+                        className="relative bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition p-4 space-y-3 cursor-pointer"
                       >
-                        <div className="flex justify-between items-start">
+                        <div className="absolute top-2 mb-5 right-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent opening the drawer
+                              setTaskToDelete(task);
+                              setShowDeleteModal(true);
+                            }}
+                            className="text-red-500 hover:text-red-700 text-xs font-semibold flex items-center gap-1 bg-red-50 px-2 py-1 rounded-md"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                        <div className="flex justify-between items-start mt-4">
                           <div>
                             <h3 className="font-semibold text-gray-800 text-sm leading-snug">
                               {task.title}
@@ -1066,7 +1081,7 @@ export default function Tasks() {
                     });
                   }
                 } catch (error) {
-                  console.error("❌ Error adding project:", error);
+                  console.error(" Error adding project:", error);
                   toast.error("Server error: Could not add project", {
                     id: "addProj",
                   });
@@ -1288,7 +1303,7 @@ export default function Tasks() {
                     });
                   }
                 } catch (error) {
-                  console.error("❌ Error adding employee:", error);
+                  console.error(" Error adding employee:", error);
                   toast.error("Server error: Could not add employee", {
                     id: "addEmp",
                   });
@@ -1496,7 +1511,7 @@ export default function Tasks() {
       {showSubtaskEmpModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-[100] animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative border border-gray-200">
-            {/* ❌ Close Button */}
+            {/*  Close Button */}
             <button
               onClick={() => setShowSubtaskEmpModal(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
@@ -1621,6 +1636,87 @@ export default function Tasks() {
               >
                 Save Selection
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-[120] animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative border border-gray-200">
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
+            >
+              <FiX size={20} />
+            </button>
+
+            <div className="flex flex-col items-center">
+              <div className="p-3 bg-red-100 rounded-full mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="red"
+                  className="w-8 h-8"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">
+                Delete Task?
+              </h2>
+              <p className="text-sm text-gray-500 mb-6">
+                Are you sure you want to delete{" "}
+                <strong>{taskToDelete?.title}</strong>? This action cannot be
+                undone.
+              </p>
+
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      toast.loading("Deleting task...", { id: "deleteTask" });
+                      const { data } = await axios.delete(
+                        `http://localhost:5000/Task/deleteTask/${taskToDelete._id}`
+                      );
+
+                      if (data.message === "Task deleted successfully") {
+                        setTasks((prev) =>
+                          prev.filter((t) => t._id !== taskToDelete._id)
+                        );
+                        toast.success("Task deleted successfully!", {
+                          id: "deleteTask",
+                        });
+                        setShowDeleteModal(false);
+                      } else {
+                        toast.error("Failed to delete task", {
+                          id: "deleteTask",
+                        });
+                      }
+                    } catch (error) {
+                      console.error("❌ Error deleting task:", error);
+                      toast.error("Server error: could not delete task", {
+                        id: "deleteTask",
+                      });
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
