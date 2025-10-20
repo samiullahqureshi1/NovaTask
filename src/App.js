@@ -31,16 +31,39 @@ import Files from "./PM/Files";
 import Goals from "./PM/Goals";
 import Performance from "./PM/Performance";
 import Reports from "./PM/Reports";
+import { Toaster } from "react-hot-toast"; // ✅ add this import
 
 const App = () => {
   return (
     <Router>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#ffffff",
+            color: "#333",
+            border: "1px solid #e5e7eb",
+            padding: "10px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#16a34a",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#dc2626",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-
-
-
+        //Nova Task
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/tasks" element={<Tasks />} />
@@ -51,14 +74,7 @@ const App = () => {
         <Route path="/goals" element={<Goals />} />
         <Route path="/performance" element={<Performance />} />
         <Route path="/reports" element={<Reports />} />
-
-
-
-
-
-
-
-
+        //end novatask
         <Route path="/human-resources" element={<HumanResources />} />
         <Route path="/crm" element={<CRM />} />
         <Route path="/employee/tasks" element={<TaskBoard />} />
@@ -77,10 +93,8 @@ const App = () => {
         />
         <Route path="/manager/approvals" element={<ManagerApprovals />} />
         <Route path="/set-password" element={<SetPassword />} />
-
         <Route path="/home" element={<Navigate to="/dashboard" />} />
         <Route path="/signup" element={<Signup />} />
-
         <Route
           path="*"
           element={
