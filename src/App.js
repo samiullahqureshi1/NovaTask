@@ -35,6 +35,7 @@ import { Toaster } from "react-hot-toast"; // ✅ add this import
 import EmployeeTasks from "./PM/EmployeeTasks";
 import EmployeeCalendar from "./PM/EmployeeCalender";
 import EmployeeTimeTracking from "./PM/EmployeeTimeTracking";
+import EmployeePerformance from "./PM/EmployeePerformance";
 
 const App = () => {
   return (
@@ -74,6 +75,7 @@ const App = () => {
         <Route path="/calendar" element={<Calendar />} />
                 <Route path="/employee/calendar" element={<EmployeeCalendar />} />
                 <Route path="/employee/time-tracking" element={<EmployeeTimeTracking />} />
+                <Route path="/employee/performance" element={<EmployeePerformance />} />
 
         <Route path="/time-tracking" element={<TimeTracking />} />
         <Route path="/files" element={<Files />} />
