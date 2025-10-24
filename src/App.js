@@ -32,6 +32,9 @@ import Goals from "./PM/Goals";
 import Performance from "./PM/Performance";
 import Reports from "./PM/Reports";
 import { Toaster } from "react-hot-toast"; // ✅ add this import
+import EmployeeTasks from "./PM/EmployeeTasks";
+import EmployeeCalendar from "./PM/EmployeeCalender";
+import EmployeeTimeTracking from "./PM/EmployeeTimeTracking";
 
 const App = () => {
   return (
@@ -69,6 +72,9 @@ const App = () => {
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/team" element={<Team />} />
         <Route path="/calendar" element={<Calendar />} />
+                <Route path="/employee/calendar" element={<EmployeeCalendar />} />
+                <Route path="/employee/time-tracking" element={<EmployeeTimeTracking />} />
+
         <Route path="/time-tracking" element={<TimeTracking />} />
         <Route path="/files" element={<Files />} />
         <Route path="/goals" element={<Goals />} />
@@ -77,7 +83,7 @@ const App = () => {
         //end novatask
         <Route path="/human-resources" element={<HumanResources />} />
         <Route path="/crm" element={<CRM />} />
-        <Route path="/employee/tasks" element={<TaskBoard />} />
+        <Route path="/employee/tasks" element={<EmployeeTasks />} />
         <Route path="/employee/announcements" element={<AnnouncementPage />} />
         <Route path="/employee/attendance" element={<EmployeeAttendance />} />
         <Route path="/employee/payroll" element={<EmployeePayroll />} />

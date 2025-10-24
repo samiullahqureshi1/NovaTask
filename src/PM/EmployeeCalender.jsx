@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function Calendar() {
+export default function EmployeeCalendar() {
   const [activeTab, setActiveTab] = useState("calendar");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -189,24 +189,7 @@ export default function Calendar() {
           <h1 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
             <FiCalendar size={22} /> Calendar
           </h1>
-          <button
-            onClick={() => {
-              setDrawerOpen(true);
-              setEditMode(false);
-              setNewEvent({
-                title: "",
-                description: "",
-                type: "Meeting",
-                date: "",
-                time: "",
-                location: "",
-                color: "blue",
-              });
-            }}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition"
-          >
-            <FiPlus size={16} /> Add Event
-          </button>
+        
         </header>
 
         {/* Tabs */}
