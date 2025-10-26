@@ -210,7 +210,7 @@ export default function Sidebar() {
     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/calendar" },
     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/time-tracking" },
     { name: "Files", icon: <FileText size={18} />, path: "/files" },
-    { name: "Goals & KPIs", icon: <Target size={18} />, path: "/goals" },
+    // { name: "Goals & KPIs", icon: <Target size={18} />, path: "/goals" },
     { name: "Performance", icon: <LineChart size={18} />, path: "/performance" },
     { name: "Reports", icon: <BarChart2 size={18} />, path: "/reports" },
   ];
@@ -222,7 +222,7 @@ export default function Sidebar() {
     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/employee/calendar" },
     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/employee/time-tracking" },
     { name: "Files", icon: <FileText size={18} />, path: "/employee/files" },
-    { name: "Goals & KPIs", icon: <Target size={18} />, path: "/employee/goals" },
+    // { name: "Goals & KPIs", icon: <Target size={18} />, path: "/employee/goals" },
     { name: "Performance", icon: <LineChart size={18} />, path: "/employee/performance" },
   ];
 

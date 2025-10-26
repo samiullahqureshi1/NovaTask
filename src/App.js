@@ -36,6 +36,7 @@ import EmployeeTasks from "./PM/EmployeeTasks";
 import EmployeeCalendar from "./PM/EmployeeCalender";
 import EmployeeTimeTracking from "./PM/EmployeeTimeTracking";
 import EmployeePerformance from "./PM/EmployeePerformance";
+import EmployeeFiles from "./PM/EmployeeFiles";
 
 const App = () => {
   return (
@@ -76,6 +77,9 @@ const App = () => {
                 <Route path="/employee/calendar" element={<EmployeeCalendar />} />
                 <Route path="/employee/time-tracking" element={<EmployeeTimeTracking />} />
                 <Route path="/employee/performance" element={<EmployeePerformance />} />
+                <Route path="/employee/files" element={<EmployeeFiles />} />
+
+
 
         <Route path="/time-tracking" element={<TimeTracking />} />
         <Route path="/files" element={<Files />} />
