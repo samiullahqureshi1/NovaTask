@@ -243,8 +243,7 @@ export default function Projects() {
     }
   };
 
-  const formatDate = (d) =>
-    d ? new Date(d).toLocaleDateString("en-US") : "—";
+  const formatDate = (d) => (d ? new Date(d).toLocaleDateString("en-US") : "—");
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">

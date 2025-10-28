@@ -1,67 +1,104 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../component/Sidebar";
 import {
   FiFileText,
   FiUpload,
   FiSearch,
   FiFilter,
-  FiMoreVertical,
   FiDownload,
   FiTrash2,
   FiImage,
   FiVideo,
   FiFile,
+  FiMoreVertical,
+  FiX,
 } from "react-icons/fi";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Files() {
+  const [files, setFiles] = useState([]);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All");
-
-  // 🧩 Sample File Data (replace later with API)
-  const files = [
-    {
-      id: 1,
-      name: "Project Plan.pdf",
-      type: "Document",
-      size: "1.2 MB",
-      uploadedBy: "Arjun Mehta",
-      date: "2025-10-15",
-    },
-    {
-      id: 2,
-      name: "Team Photo.png",
-      type: "Image",
-      size: "800 KB",
-      uploadedBy: "Priya Sharma",
-      date: "2025-10-16",
-    },
-    {
-      id: 3,
-      name: "Demo Video.mp4",
-      type: "Video",
-      size: "24 MB",
-      uploadedBy: "Vikram Singh",
-      date: "2025-10-17",
-    },
-    {
-      id: 4,
-      name: "Tasks.xlsx",
-      type: "Document",
-      size: "600 KB",
-      uploadedBy: "Ravi Patel",
-      date: "2025-10-18",
-    },
-    {
-      id: 5,
-      name: "Logo.svg",
-      type: "Image",
-      size: "150 KB",
-      uploadedBy: "Simran Kaur",
-      date: "2025-10-19",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(null);
+  const [fileToDelete, setFileToDelete] = useState(null);
 
   const fileTypes = ["All", "Document", "Image", "Video"];
+
+  useEffect(() => {
+    fetchAllFiles();
+  }, []);
+
+  const fetchAllFiles = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("http://localhost:5000/api/files/");
+      setFiles(res.data || []);
+    } catch (err) {
+      console.error("Error fetching admin files:", err);
+      toast.error("Failed to fetch files");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const userId = localStorage.getItem("employeeId"); // ✅ consistent key
+    const userName = "Admin"; // ✅ or localStorage.getItem("adminName")
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", userId || "000000000000000000000000"); // fallback
+    formData.append("userName", userName);
+
+    try {
+      setUploading(true);
+      const res = await axios.post(
+        "http://localhost:5000/api/files/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      if (res.status === 201) {
+        toast.success("File uploaded successfully!");
+        fetchAllFiles(); // ✅ correct function name
+      } else {
+        toast.error("Upload failed");
+      }
+    } catch (err) {
+      console.error("Upload error:", err.response?.data || err.message);
+      toast.error(err.response?.data?.error || "Server error during upload");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const openDeleteModal = (file) => setFileToDelete(file);
+
+  const confirmDelete = async () => {
+    if (!fileToDelete) return;
+    try {
+      setDeleting(fileToDelete._id);
+      await axios.delete(`http://localhost:5000/api/files/${fileToDelete._id}`);
+      toast.success("File deleted successfully!");
+      setFiles((prev) => prev.filter((f) => f._id !== fileToDelete._id));
+      setFileToDelete(null);
+    } catch (err) {
+      console.error("Delete failed:", err);
+      toast.error("Delete failed");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const cancelDelete = () => setFileToDelete(null);
 
   const filteredFiles = files.filter(
     (f) =>
@@ -85,21 +122,26 @@ export default function Files() {
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
 
-      {/* MAIN AREA */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
+        {/* HEADER */}
         <header className="flex justify-between items-center bg-white px-8 py-4 border-b border-gray-200 shadow-sm">
           <h1 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
-            <FiFileText size={22} /> Files
+            <FiFileText size={22} /> All Employee Files
           </h1>
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
-            <FiUpload size={16} /> Upload File
-          </button>
+
+          <label className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md cursor-pointer transition">
+            <FiUpload size={16} /> {uploading ? "Uploading..." : "Upload File"}
+            <input
+              type="file"
+              className="hidden"
+              onChange={handleUpload}
+              disabled={uploading}
+            />
+          </label>
         </header>
 
-        {/* Filters */}
+        {/* FILTERS */}
         <div className="bg-white border-b border-gray-100 px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-          {/* Search Bar */}
           <div className="flex items-center bg-gray-100 rounded-md px-3 py-2 w-full max-w-sm">
             <FiSearch className="text-gray-400" size={18} />
             <input
@@ -111,7 +153,6 @@ export default function Files() {
             />
           </div>
 
-          {/* Filter Dropdown */}
           <div className="flex items-center gap-3">
             <FiFilter className="text-gray-500" size={18} />
             <select
@@ -126,20 +167,23 @@ export default function Files() {
           </div>
         </div>
 
-        {/* Files Grid */}
+        {/* FILES GRID */}
         <main className="flex-1 overflow-y-auto p-8">
-          {filteredFiles.length === 0 ? (
-            <div className="text-center text-gray-500 mt-20">
+          {loading ? (
+            <div className="text-center text-gray-500 mt-20 text-sm">
+              Loading files...
+            </div>
+          ) : filteredFiles.length === 0 ? (
+            <div className="text-center text-gray-500 mt-20 italic">
               No files found 😕
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredFiles.map((file) => (
                 <div
-                  key={file.id}
+                  key={file._id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition p-6 flex flex-col justify-between"
                 >
-                  {/* Top Section */}
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
                       <div className="bg-gray-100 p-3 rounded-lg">
@@ -159,27 +203,35 @@ export default function Files() {
                     </button>
                   </div>
 
-                  {/* File Info */}
                   <div className="mt-4 text-sm text-gray-600 space-y-1">
                     <p>
                       <span className="font-medium text-gray-700">
                         Uploaded by:
                       </span>{" "}
-                      {file.uploadedBy}
+                      {file.uploadedByName || "Unknown"}
                     </p>
                     <p>
                       <span className="font-medium text-gray-700">Date:</span>{" "}
-                      {file.date}
+                      {new Date(file.createdAt).toLocaleDateString()}
                     </p>
                   </div>
 
-                  {/* Footer Actions */}
                   <div className="flex justify-between items-center mt-5 pt-3 border-t border-gray-100">
-                    <button className="flex items-center gap-1 text-blue-600 text-xs font-semibold hover:underline">
+                    <a
+                      href={file.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-1 text-blue-600 text-xs font-semibold hover:underline"
+                    >
                       <FiDownload size={14} /> Download
-                    </button>
-                    <button className="flex items-center gap-1 text-red-500 text-xs font-semibold hover:underline">
-                      <FiTrash2 size={14} /> Delete
+                    </a>
+                    <button
+                      onClick={() => openDeleteModal(file)}
+                      disabled={deleting === file._id}
+                      className="flex items-center gap-1 text-red-500 text-xs font-semibold hover:underline"
+                    >
+                      <FiTrash2 size={14} />
+                      {deleting === file._id ? "Deleting..." : "Delete"}
                     </button>
                   </div>
                 </div>
@@ -188,6 +240,47 @@ export default function Files() {
           )}
         </main>
       </div>
+
+      {/* DELETE CONFIRM MODAL */}
+      {fileToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-800">Confirm Delete</h2>
+              <button
+                onClick={cancelDelete}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-gray-800">
+                {fileToDelete.name}
+              </span>
+              ? This action cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 text-sm bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleting === fileToDelete._id}
+                className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting === fileToDelete._id ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

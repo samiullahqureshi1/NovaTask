@@ -1,179 +1,220 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Sidebar from "../component/Sidebar";
+import toast from "react-hot-toast";
 import {
   FiClock,
-  FiPlay,
-  FiPause,
-  FiSearch,
-  FiFilter,
-  FiPlus,
+  FiUser,
+  FiFolder,
   FiCalendar,
+  FiCheckCircle,
+  FiChevronDown,
+  FiChevronUp,
 } from "react-icons/fi";
 
 export default function TimeTracking() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [runningTask, setRunningTask] = useState(null);
+  const [projects, setProjects] = useState([]);
+  const [expanded, setExpanded] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // 🧩 Sample Time Tracking Data (replace with API later)
-  const timeEntries = [
-    {
-      id: 1,
-      task: "Design new dashboard UI",
-      project: "Nova Admin Panel",
-      date: "2025-10-18",
-      duration: "2h 15m",
-      status: "Completed",
-    },
-    {
-      id: 2,
-      task: "Setup Firebase Auth",
-      project: "NovaTask Web",
-      date: "2025-10-19",
-      duration: "1h 40m",
-      status: "Active",
-    },
-    {
-      id: 3,
-      task: "Meeting with Client",
-      project: "CRM Revamp",
-      date: "2025-10-17",
-      duration: "45m",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      task: "Code review & testing",
-      project: "Task API",
-      date: "2025-10-16",
-      duration: "3h 20m",
-      status: "Paused",
-    },
-  ];
-
-  const statuses = ["All", "Active", "Paused", "Completed"];
-
-  const filteredEntries = timeEntries.filter(
-    (entry) =>
-      (statusFilter === "All" || entry.status === statusFilter) &&
-      entry.task.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleToggleTimer = (id) => {
-    if (runningTask === id) setRunningTask(null);
-    else setRunningTask(id);
+  const formatTime = (seconds) => {
+    if (!seconds) return "0h 0m";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${h}h ${m}m`;
   };
+
+  useEffect(() => {
+    const fetchProjectTracking = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get("http://localhost:5000/task/getAllProjectTimeTracking");
+
+        if (data.success) {
+          setProjects(data.projects);
+        } else {
+          toast.error("Failed to fetch project time tracking");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Server error while fetching project tracking");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjectTracking();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center text-gray-500 text-lg font-medium">
+        Loading project time tracking...
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
 
-      {/* MAIN AREA */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="flex justify-between items-center bg-white px-8 py-4 border-b border-gray-200 shadow-sm">
-          <h1 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
-            <FiClock size={22} /> Time Tracking
-          </h1>
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
-            <FiPlus size={16} /> Log Time
-          </button>
-        </header>
-
-        {/* Filters */}
-        <div className="bg-white border-b border-gray-100 px-8 py-4 flex flex-wrap items-center justify-between gap-4">
-          {/* Search Bar */}
-          <div className="flex items-center bg-gray-100 rounded-md px-3 py-2 w-full max-w-sm">
-            <FiSearch className="text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search tasks..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-transparent outline-none ml-2 text-sm text-gray-700 w-full"
-            />
-          </div>
-
-          {/* Filter Dropdown */}
-          <div className="flex items-center gap-3">
-            <FiFilter className="text-gray-500" size={18} />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-gray-300 rounded-md text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {statuses.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
+      <div className="flex-1 flex flex-col p-8 overflow-y-auto">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">📊 Project Time Tracking</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Detailed overview of projects, tasks & employee time contribution
+            </p>
           </div>
         </div>
 
-        {/* Table Section */}
-        <main className="flex-1 overflow-y-auto p-8">
-          {filteredEntries.length === 0 ? (
-            <div className="text-center text-gray-500 mt-20">
-              No time entries found 😕
-            </div>
-          ) : (
-            <div className="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm">
-              <table className="min-w-full text-sm text-gray-700">
-                <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-                  <tr>
-                    <th className="px-6 py-3 text-left font-semibold">Task</th>
-                    <th className="px-6 py-3 text-left font-semibold">Project</th>
-                    <th className="px-6 py-3 text-left font-semibold">Date</th>
-                    <th className="px-6 py-3 text-left font-semibold">Duration</th>
-                    <th className="px-6 py-3 text-left font-semibold">Status</th>
-                    <th className="px-6 py-3 text-center font-semibold">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredEntries.map((entry) => (
-                    <tr
-                      key={entry.id}
-                      className="border-t border-gray-100 hover:bg-gray-50 transition"
-                    >
-                      <td className="px-6 py-3 font-medium text-gray-800">
-                        {entry.task}
-                      </td>
-                      <td className="px-6 py-3">{entry.project}</td>
-                      <td className="px-6 py-3 flex items-center gap-1 text-gray-600">
-                        <FiCalendar size={14} /> {entry.date}
-                      </td>
-                      <td className="px-6 py-3">{entry.duration}</td>
-                      <td className="px-6 py-3">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            entry.status === "Active"
-                              ? "bg-green-100 text-green-700"
-                              : entry.status === "Paused"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-700"
-                          }`}
+        {/* NO DATA */}
+        {projects.length === 0 ? (
+          <div className="text-center text-gray-500 italic mt-20">
+            No project tracking data found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            {projects.map((proj, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-2xl shadow-md hover:shadow-lg bg-white transition-all duration-300 overflow-hidden"
+              >
+                {/* PROJECT HEADER CARD */}
+                <div
+                  onClick={() => setExpanded(expanded === index ? null : index)}
+                  className="cursor-pointer bg-gradient-to-r from-emerald-500 via-green-400 to-teal-500 text-white p-6 rounded-t-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-white bg-opacity-20 rounded-full">
+                      <FiFolder size={24} />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold">{proj.project?.name}</h2>
+                      <p className="text-xs mt-1 flex items-center gap-2 text-emerald-100">
+                        <FiCalendar size={12} />
+                        Deadline:{" "}
+                        {proj.project?.deadline
+                          ? new Date(proj.project.deadline).toLocaleDateString()
+                          : "No deadline"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 mt-4 sm:mt-0">
+                    <div className="flex items-center gap-2 bg-white text-emerald-700 rounded-xl px-4 py-2 shadow-sm">
+                      <FiClock />
+                      <span className="text-sm font-semibold">
+                        {formatTime(proj.totalProjectTime)}
+                      </span>
+                    </div>
+                    {expanded === index ? (
+                      <FiChevronUp className="text-white text-xl" />
+                    ) : (
+                      <FiChevronDown className="text-white text-xl" />
+                    )}
+                  </div>
+                </div>
+
+                {/* PROJECT DETAILS */}
+                {expanded === index && (
+                  <div className="p-6 bg-gray-50 border-t space-y-6">
+                    {/* TASK LIST */}
+                    {proj.tasks.length === 0 ? (
+                      <p className="text-center text-gray-500 italic">No tasks found.</p>
+                    ) : (
+                      proj.tasks.map((task, tIndex) => (
+                        <div
+                          key={tIndex}
+                          className="bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-300"
                         >
-                          {entry.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3 text-center">
-                        <button
-                          onClick={() => handleToggleTimer(entry.id)}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          {runningTask === entry.id ? (
-                            <FiPause size={18} />
-                          ) : (
-                            <FiPlay size={18} />
-                          )}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </main>
+                          {/* TASK HEADER */}
+                          <div className="flex justify-between items-center mb-3">
+                            <div className="flex items-center gap-2">
+                              <FiCheckCircle
+                                className={`${
+                                  task.status === "Completed"
+                                    ? "text-green-500"
+                                    : "text-gray-400"
+                                }`}
+                                size={18}
+                              />
+                              <h3 className="text-md font-semibold text-gray-800">
+                                {task.title}
+                              </h3>
+                            </div>
+                            <span
+                              className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                                task.priority === "High"
+                                  ? "bg-red-100 text-red-700"
+                                  : task.priority === "Medium"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-green-100 text-green-700"
+                              }`}
+                            >
+                              {task.priority}
+                            </span>
+                          </div>
+
+                          {/* TASK DETAILS */}
+                          <div className="text-sm text-gray-600 mb-3 flex justify-between">
+                            <span>
+                              Total Task Time:{" "}
+                              <span className="font-semibold text-gray-800">
+                                {formatTime(task.totalTime)}
+                              </span>
+                            </span>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                                task.status === "Completed"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {task.status}
+                            </span>
+                          </div>
+
+                          {/* EMPLOYEES */}
+                          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {task.employees.map((emp, eIndex) => (
+                              <div
+                                key={eIndex}
+                                className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-all"
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <FiUser className="text-emerald-500" size={16} />
+                                  <p className="text-sm font-medium text-gray-800">
+                                    {emp.name}
+                                  </p>
+                                </div>
+                                <div className="flex items-center justify-between text-xs text-gray-600">
+                                  <span>Time: {formatTime(emp.timeSpent)}</span>
+                                  <span
+                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                      emp.status === "done"
+                                        ? "bg-green-100 text-green-700"
+                                        : emp.status === "inprogress"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-gray-100 text-gray-700"
+                                    }`}
+                                  >
+                                    {emp.status}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

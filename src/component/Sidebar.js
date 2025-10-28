@@ -1,4 +1,4 @@
-// import { useState } from "react";
+// import { useState, useEffect } from "react";
 // import { NavLink, useLocation, useNavigate } from "react-router-dom";
 // import {
 //   LayoutDashboard,
@@ -15,44 +15,80 @@
 //   LogOut,
 //   ChevronLeft,
 //   ChevronRight,
-//   Clock4, // ⏱️ For Time Tracking
+//   Clock4,
+//   User,
 // } from "lucide-react";
+// import {jwtDecode} from "jwt-decode"; // ⚡ Make sure to install this: npm install jwt-decode
 
 // export default function Sidebar() {
 //   const location = useLocation();
 //   const navigate = useNavigate();
 //   const [isCollapsed, setIsCollapsed] = useState(false);
+//   const [role, setRole] = useState(null);
 
-//   // Project Management Menu (with Time Tracking)
-//   const menuItems = [
-//     { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/dashboard" },
-//     { name: "Projects", icon: <FolderKanban size={18} />, path: "/projects" },
-//     { name: "Tasks", icon: <ClipboardCheck size={18} />, path: "/tasks" },
-//     { name: "Team", icon: <Users size={18} />, path: "/team" },
-//     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/calendar" },
-//     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/time-tracking" }, // ⏱️ Added Module
-//     { name: "Files", icon: <FileText size={18} />, path: "/files" },
-//     { name: "Goals & KPIs", icon: <Target size={18} />, path: "/goals" },
-//     { name: "Performance", icon: <LineChart size={18} />, path: "/performance" },
-//     { name: "Reports", icon: <BarChart2 size={18} />, path: "/reports" },
-//   ];
-
-//   const bottomMenu = [
-//     { name: "Settings", icon: <Settings size={18} />, path: "/settings" },
-//     { name: "Help & Support", icon: <LifeBuoy size={18} />, path: "/support" },
-//   ];
+//   // 🧩 Decode Role from JWT Token
+//   useEffect(() => {
+//     const token = localStorage.getItem("token");
+//     if (token) {
+//       try {
+//         const decoded = jwtDecode(token);
+//         setRole(decoded.role || "employee"); // default employee if not found
+//       } catch (error) {
+//         console.error("Invalid token:", error);
+//         setRole("employee");
+//       }
+//     } else {
+//       setRole("employee");
+//     }
+//   }, []);
 
 //   const handleLogout = () => {
 //     localStorage.clear();
 //     navigate("/login", { replace: true });
 //   };
 
-//   // --- THEME: Static + Neutral + Professional ---
+//   // --- COMMON THEME ---
 //   const baseBg = "bg-white border-r border-gray-200";
 //   const hoverBg = "hover:bg-gray-100";
 //   const activeBg = "bg-blue-50 border-l-4 border-blue-500";
 //   const textColor = "text-gray-600";
 //   const activeText = "text-blue-600 font-medium";
+
+//   // --- ADMIN MENU ---
+//   const adminMenu = [
+//     { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/dashboard" },
+//     { name: "Projects", icon: <FolderKanban size={18} />, path: "/projects" },
+//     { name: "Tasks", icon: <ClipboardCheck size={18} />, path: "/tasks" },
+//     { name: "Team", icon: <Users size={18} />, path: "/team" },
+//     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/calendar" },
+//     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/time-tracking" },
+//     { name: "Files", icon: <FileText size={18} />, path: "/files" },
+//     { name: "Performance", icon: <LineChart size={18} />, path: "/performance" },
+//   ];
+
+//   // --- EMPLOYEE MENU ---
+//   const employeeMenu = [
+//     { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/dashboard" },
+//     { name: "My Tasks", icon: <ClipboardCheck size={18} />, path: "/employee/tasks" },
+//     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/employee/calendar" },
+//     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/employee/time-tracking" },
+//     { name: "Files", icon: <FileText size={18} />, path: "/employee/files" },
+//     { name: "Performance", icon: <LineChart size={18} />, path: "/employee/performance" },
+//   ];
+
+//   const bottomMenu =
+//     role === "admin"
+//       ? [
+//           { name: "Settings", icon: <Settings size={18} />, path: "/settings" },
+//           { name: "Help & Support", icon: <LifeBuoy size={18} />, path: "/support" },
+//         ]
+//       : [
+//           { name: "Profile", icon: <User size={18} />, path: "/employee/profile" },
+//           { name: "Help & Support", icon: <LifeBuoy size={18} />, path: "/employee/support" },
+//         ];
+
+//   // --- CHOOSE MENU BASED ON ROLE ---
+//   const menuItems = role === "admin" ? adminMenu : employeeMenu;
 
 //   return (
 //     <div
@@ -81,7 +117,7 @@
 //       <div className="flex-1">
 //         {!isCollapsed && (
 //           <p className="text-xs font-semibold uppercase text-gray-400 px-5 mb-3 tracking-wide">
-//             Project Management
+//             {role === "admin" ? "Project Management" : "Employee Panel"}
 //           </p>
 //         )}
 
@@ -155,7 +191,6 @@ import {
   CalendarDays,
   FileText,
   BarChart2,
-  Target,
   LineChart,
   Settings,
   LifeBuoy,
@@ -164,22 +199,30 @@ import {
   ChevronRight,
   Clock4,
   User,
+  Briefcase,
+  Building,
+  Handshake,
+  ChevronDown,
+  Target,
 } from "lucide-react";
-import {jwtDecode} from "jwt-decode"; // ⚡ Make sure to install this: npm install jwt-decode
+import { jwtDecode } from "jwt-decode";
+import { motion, AnimatePresence } from "framer-motion"; // ✅ optional for animation (npm i framer-motion)
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [role, setRole] = useState(null);
+  const [activeModule, setActiveModule] = useState("pm"); // default: PM
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // 🧩 Decode Role from JWT Token
+  // 🧩 Decode Role from JWT
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setRole(decoded.role || "employee"); // default employee if not found
+        setRole(decoded.role || "employee");
       } catch (error) {
         console.error("Invalid token:", error);
         setRole("employee");
@@ -194,15 +237,15 @@ export default function Sidebar() {
     navigate("/login", { replace: true });
   };
 
-  // --- COMMON THEME ---
+  // --- COMMON THEMING ---
   const baseBg = "bg-white border-r border-gray-200";
   const hoverBg = "hover:bg-gray-100";
   const activeBg = "bg-blue-50 border-l-4 border-blue-500";
   const textColor = "text-gray-600";
   const activeText = "text-blue-600 font-medium";
 
-  // --- ADMIN MENU ---
-  const adminMenu = [
+  // --- ADMIN MODULE MENUS ---
+  const pmMenu = [
     { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/dashboard" },
     { name: "Projects", icon: <FolderKanban size={18} />, path: "/projects" },
     { name: "Tasks", icon: <ClipboardCheck size={18} />, path: "/tasks" },
@@ -210,9 +253,25 @@ export default function Sidebar() {
     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/calendar" },
     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/time-tracking" },
     { name: "Files", icon: <FileText size={18} />, path: "/files" },
-    // { name: "Goals & KPIs", icon: <Target size={18} />, path: "/goals" },
     { name: "Performance", icon: <LineChart size={18} />, path: "/performance" },
-    { name: "Reports", icon: <BarChart2 size={18} />, path: "/reports" },
+  ];
+
+  const hrmMenu = [
+    { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/hr/dashboard" },
+    { name: "Employees", icon: <Users size={18} />, path: "/hr/employees" },
+    { name: "Attendance", icon: <Clock4 size={18} />, path: "/hr/attendance" },
+    { name: "Leaves", icon: <CalendarDays size={18} />, path: "/hr/leaves" },
+    { name: "Payroll", icon: <Briefcase size={18} />, path: "/hr/payroll" },
+    { name: "Reports", icon: <BarChart2 size={18} />, path: "/hr/reports" },
+  ];
+
+  const crmMenu = [
+    { name: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/crm/dashboard" },
+    { name: "Clients", icon: <Handshake size={18} />, path: "/crm/clients" },
+    { name: "Leads", icon: <Target size={18} />, path: "/crm/leads" },
+    { name: "Deals", icon: <FolderKanban size={18} />, path: "/crm/deals" },
+    { name: "Campaigns", icon: <BarChart2 size={18} />, path: "/crm/campaigns" },
+    { name: "Reports", icon: <FileText size={18} />, path: "/crm/reports" },
   ];
 
   // --- EMPLOYEE MENU ---
@@ -222,9 +281,22 @@ export default function Sidebar() {
     { name: "Calendar", icon: <CalendarDays size={18} />, path: "/employee/calendar" },
     { name: "Time Tracking", icon: <Clock4 size={18} />, path: "/employee/time-tracking" },
     { name: "Files", icon: <FileText size={18} />, path: "/employee/files" },
-    // { name: "Goals & KPIs", icon: <Target size={18} />, path: "/employee/goals" },
     { name: "Performance", icon: <LineChart size={18} />, path: "/employee/performance" },
   ];
+
+  // --- SELECT MENU BASED ON ROLE & MODULE ---
+  const getAdminMenu = () => {
+    switch (activeModule) {
+      case "hrm":
+        return hrmMenu;
+      case "crm":
+        return crmMenu;
+      default:
+        return pmMenu;
+    }
+  };
+
+  const menuItems = role === "admin" ? getAdminMenu() : employeeMenu;
 
   const bottomMenu =
     role === "admin"
@@ -237,13 +309,10 @@ export default function Sidebar() {
           { name: "Help & Support", icon: <LifeBuoy size={18} />, path: "/employee/support" },
         ];
 
-  // --- CHOOSE MENU BASED ON ROLE ---
-  const menuItems = role === "admin" ? adminMenu : employeeMenu;
-
   return (
     <div
       className={`h-screen ${isCollapsed ? "w-20" : "w-64"} 
-      ${baseBg} ${textColor} flex flex-col justify-between py-5 transition-all duration-200`}
+      ${baseBg} ${textColor} flex flex-col justify-between py-5 transition-all duration-200 relative`}
     >
       {/* Collapse Button */}
       <button
@@ -253,21 +322,69 @@ export default function Sidebar() {
         {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
       </button>
 
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 mb-8">
+      {/* Logo Section */}
+      <div className="flex items-center gap-3 px-5 mb-6">
         <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-10 h-10 flex items-center justify-center rounded-md text-white font-bold">
           NT
         </div>
-        {!isCollapsed && (
-          <span className="font-bold text-lg text-gray-800">NovaTask</span>
-        )}
+        {!isCollapsed && <span className="font-bold text-lg text-gray-800">NovaTask</span>}
       </div>
 
-      {/* Main Navigation */}
-      <div className="flex-1">
+      {/* Module Dropdown (ADMIN ONLY) */}
+      {role === "admin" && !isCollapsed && (
+        <div className="relative px-5 mb-6">
+          <button
+            onClick={() => setDropdownOpen((p) => !p)}
+            className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-3 rounded-md flex items-center justify-between text-sm transition"
+          >
+            {activeModule === "pm"
+              ? "Project Management"
+              : activeModule === "hrm"
+              ? "Human Resource Management"
+              : "Customer Relationship Management"}
+            <ChevronDown size={16} className="text-gray-500" />
+          </button>
+
+          <AnimatePresence>
+            {dropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-11 left-5 right-5 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+              >
+                <div className="flex flex-col">
+                  {[
+                    { key: "pm", label: "Project Management" },
+                    { key: "hrm", label: "Human Resource Management" },
+                    { key: "crm", label: "Customer Relationship Management" },
+                  ].map((mod) => (
+                    <button
+                      key={mod.key}
+                      onClick={() => {
+                        setActiveModule(mod.key);
+                        setDropdownOpen(false);
+                      }}
+                      className={`text-left text-sm px-3 py-2 hover:bg-blue-50 ${
+                        activeModule === mod.key ? "text-blue-600 font-semibold" : "text-gray-700"
+                      }`}
+                    >
+                      {mod.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Menu */}
+      <div className="flex-1 overflow-y-auto">
         {!isCollapsed && (
           <p className="text-xs font-semibold uppercase text-gray-400 px-5 mb-3 tracking-wide">
-            {role === "admin" ? "Project Management" : "Employee Panel"}
+            {role === "admin" ? "Navigation" : "Employee Panel"}
           </p>
         )}
 
@@ -279,11 +396,11 @@ export default function Sidebar() {
                 key={item.name}
                 to={item.path}
                 className={`flex items-center gap-3 px-5 py-2.5 text-sm rounded-md transition-all 
-                ${
-                  isActive
-                    ? `${activeBg} ${activeText}`
-                    : `${hoverBg} ${textColor}`
-                } ${isCollapsed ? "justify-center" : ""}`}
+                  ${
+                    isActive
+                      ? `${activeBg} ${activeText}`
+                      : `${hoverBg} ${textColor}`
+                  } ${isCollapsed ? "justify-center" : ""}`}
               >
                 {item.icon}
                 {!isCollapsed && <span>{item.name}</span>}
@@ -293,7 +410,7 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Divider */}
+      {/* Bottom Divider */}
       <div className="border-t border-gray-200 my-3 mx-4"></div>
 
       {/* Bottom Menu */}
@@ -305,11 +422,11 @@ export default function Sidebar() {
               key={item.name}
               to={item.path}
               className={`flex items-center gap-3 px-5 py-2.5 text-sm rounded-md transition-all 
-              ${
-                isActive
-                  ? `${activeBg} ${activeText}`
-                  : `${hoverBg} ${textColor}`
-              } ${isCollapsed ? "justify-center" : ""}`}
+                ${
+                  isActive
+                    ? `${activeBg} ${activeText}`
+                    : `${hoverBg} ${textColor}`
+                } ${isCollapsed ? "justify-center" : ""}`}
             >
               {item.icon}
               {!isCollapsed && <span>{item.name}</span>}
@@ -317,7 +434,6 @@ export default function Sidebar() {
           );
         })}
 
-        {/* Logout */}
         <button
           onClick={handleLogout}
           className={`flex items-center gap-3 px-5 py-2.5 text-sm text-gray-500 hover:text-red-500 hover:bg-gray-100 w-full rounded-md transition ${
