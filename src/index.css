@@ -13,3 +13,29 @@
       -moz-appearance: textfield;
     }
   }
+  /* index.css or App.css */
+
+/* 🧩 NovaTask Dark Scrollbar Theme */
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.6);
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 100%);
+}
+
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 #1f2937; /* Firefox support */
+}
