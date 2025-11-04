@@ -889,216 +889,233 @@ export default function EmployeePerformance() {
 
   const taskStatusData = [
     { id: "Done", label: "Done", value: completed, color: "#10B981" },
-    { id: "In Progress", label: "In Progress", value: inprogress, color: "#EAB308" },
+    {
+      id: "In Progress",
+      label: "In Progress",
+      value: inprogress,
+      color: "#EAB308",
+    },
     { id: "Pending", label: "Pending", value: pending, color: "#9CA3AF" },
   ];
 
   return (
     <div className="flex h-screen bg-gray-950 overflow-hidden text-gray-200">
-  <Sidebar />
+      <Sidebar />
 
-  <div className="flex-1 p-8 overflow-y-auto custom-scroll">
-    {/* ================= HEADER ================= */}
-    {employee && (
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-r from-indigo-900/40 via-gray-900/60 to-gray-950/80 border border-gray-800 rounded-2xl shadow-lg p-6 mb-8 backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-600 text-white rounded-full shadow-md">
-            <FiUser size={22} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-100">
-              {employee.name}
-            </h2>
-            <p className="text-sm text-gray-400">{employee.email}</p>
-          </div>
-        </div>
-
-        <div className="mt-4 sm:mt-0 flex items-center gap-4">
-          <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-5 py-3 flex items-center gap-2 shadow-sm">
-            <FiClock className="text-indigo-400" />
-            <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">
-                Total Time Logged
-              </p>
-              <p className="text-base font-semibold text-gray-100">
-                {formatTime(totalTime)}
-              </p>
-            </div>
-          </div>
-          {employee.workingHours && (
-            <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-5 py-3 flex items-center gap-2 shadow-sm">
-              <FiActivity className="text-green-400" />
+      <div className="flex-1 p-8 overflow-y-auto custom-scroll">
+        {/* ================= HEADER ================= */}
+        {employee && (
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gradient-to-r from-indigo-900/40 via-gray-900/60 to-gray-950/80 border border-gray-800 rounded-2xl shadow-lg p-6 mb-8 backdrop-blur-md">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-600 text-white rounded-full shadow-md">
+                <FiUser size={22} />
+              </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase font-semibold">
-                  Daily Working Hours
-                </p>
-                <p className="text-base font-semibold text-gray-100">
-                  {employee.workingHours} hrs
-                </p>
+                <h2 className="text-2xl font-bold text-gray-100">
+                  {employee.name}
+                </h2>
+                <p className="text-sm text-gray-400">{employee.email}</p>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    )}
 
-    {/* ================= METRICS ================= */}
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-indigo-500/50 transition backdrop-blur-sm">
-        <p className="text-xs text-gray-400 uppercase">Total Tasks</p>
-        <h3 className="text-2xl font-bold text-gray-100 mt-2">{totalTasks}</h3>
-      </div>
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-green-500/40 transition backdrop-blur-sm">
-        <p className="text-xs text-gray-400 uppercase">Completed</p>
-        <h3 className="text-2xl font-bold text-green-400 mt-2">{completed}</h3>
-      </div>
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-amber-500/40 transition backdrop-blur-sm">
-        <p className="text-xs text-gray-400 uppercase">In Progress</p>
-        <h3 className="text-2xl font-bold text-amber-400 mt-2">{inprogress}</h3>
-      </div>
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-indigo-500/50 transition backdrop-blur-sm">
-        <p className="text-xs text-gray-400 uppercase">Completion Rate</p>
-        <h3 className="text-2xl font-bold text-indigo-400 mt-2">
-          {completionRate}%
-        </h3>
-      </div>
-    </div>
-
-    {/* ================= CHARTS ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-      {/* Bar Chart */}
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
-        <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-          <FiClock className="text-indigo-400" /> Time Spent per Project
-        </h3>
-        {projectData.length > 0 ? (
-          <div style={{ height: 300 }}>
-            <ResponsiveBar
-              data={projectData}
-              keys={["Hours Worked"]}
-              indexBy="project"
-              margin={{ top: 20, right: 30, bottom: 50, left: 60 }}
-              padding={0.3}
-              colors={{ scheme: "nivo" }}
-              borderRadius={5}
-              enableLabel={false}
-              theme={{
-                textColor: "#d1d5db",
-                tooltip: { container: { background: "#111827", color: "#f9fafb" } },
-              }}
-              axisBottom={{
-                tickRotation: -25,
-                legend: "Project",
-                legendPosition: "middle",
-                legendOffset: 40,
-              }}
-              axisLeft={{
-                legend: "Hours",
-                legendPosition: "middle",
-                legendOffset: -45,
-              }}
-              tooltip={({ indexValue, value }) => (
-                <div className="bg-gray-900 text-gray-100 text-sm p-2 rounded shadow-md border border-gray-700">
-                  <strong>{indexValue}</strong>: {value} hrs
+            <div className="mt-4 sm:mt-0 flex items-center gap-4">
+              <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-5 py-3 flex items-center gap-2 shadow-sm">
+                <FiClock className="text-indigo-400" />
+                <div>
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                    Total Time Logged
+                  </p>
+                  <p className="text-base font-semibold text-gray-100">
+                    {formatTime(totalTime)}
+                  </p>
+                </div>
+              </div>
+              {employee.workingHours && (
+                <div className="bg-gray-900/70 border border-gray-800 rounded-xl px-5 py-3 flex items-center gap-2 shadow-sm">
+                  <FiActivity className="text-green-400" />
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Daily Working Hours
+                    </p>
+                    <p className="text-base font-semibold text-gray-100">
+                      {employee.workingHours} hrs
+                    </p>
+                  </div>
                 </div>
               )}
-              animate={true}
-              motionConfig="gentle"
-            />
+            </div>
           </div>
-        ) : (
-          <p className="text-sm text-gray-500 text-center">
-            No data available
-          </p>
         )}
-      </div>
 
-      {/* Pie Chart */}
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
-        <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
-          <FiCheckCircle className="text-green-400" /> Task Status Breakdown
-        </h3>
-        <div style={{ height: 300 }}>
-          <ResponsivePie
-            data={taskStatusData}
-            margin={{ top: 30, right: 40, bottom: 40, left: 40 }}
-            innerRadius={0.6}
-            padAngle={2}
-            cornerRadius={4}
-            colors={{ datum: "data.color" }}
-            borderWidth={2}
-            borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-            arcLinkLabelsSkipAngle={10}
-            arcLinkLabelsTextColor="#d1d5db"
-            arcLabelsSkipAngle={10}
-            arcLabelsTextColor={{ from: "color", modifiers: [["darker", 2]] }}
-            theme={{
-              textColor: "#d1d5db",
-              tooltip: { container: { background: "#111827", color: "#f9fafb" } },
-            }}
-            tooltip={({ datum }) => (
-              <div className="bg-gray-900 text-gray-100 text-sm p-2 rounded shadow-md border border-gray-700">
-                <strong>{datum.id}</strong>: {datum.value}
+        {/* ================= METRICS ================= */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-indigo-500/50 transition backdrop-blur-sm">
+            <p className="text-xs text-gray-400 uppercase">Total Tasks</p>
+            <h3 className="text-2xl font-bold text-gray-100 mt-2">
+              {totalTasks}
+            </h3>
+          </div>
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-green-500/40 transition backdrop-blur-sm">
+            <p className="text-xs text-gray-400 uppercase">Completed</p>
+            <h3 className="text-2xl font-bold text-green-400 mt-2">
+              {completed}
+            </h3>
+          </div>
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-amber-500/40 transition backdrop-blur-sm">
+            <p className="text-xs text-gray-400 uppercase">In Progress</p>
+            <h3 className="text-2xl font-bold text-amber-400 mt-2">
+              {inprogress}
+            </h3>
+          </div>
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-5 shadow-sm hover:border-indigo-500/50 transition backdrop-blur-sm">
+            <p className="text-xs text-gray-400 uppercase">Completion Rate</p>
+            <h3 className="text-2xl font-bold text-indigo-400 mt-2">
+              {completionRate}%
+            </h3>
+          </div>
+        </div>
+
+        {/* ================= CHARTS ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          {/* Bar Chart */}
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
+            <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+              <FiClock className="text-indigo-400" /> Time Spent per Project
+            </h3>
+            {projectData.length > 0 ? (
+              <div style={{ height: 300 }}>
+                <ResponsiveBar
+                  data={projectData}
+                  keys={["Hours Worked"]}
+                  indexBy="project"
+                  margin={{ top: 20, right: 30, bottom: 50, left: 60 }}
+                  padding={0.3}
+                  colors={{ scheme: "nivo" }}
+                  borderRadius={5}
+                  enableLabel={false}
+                  theme={{
+                    textColor: "#d1d5db",
+                    tooltip: {
+                      container: { background: "#111827", color: "#f9fafb" },
+                    },
+                  }}
+                  axisBottom={{
+                    tickRotation: -25,
+                    legend: "Project",
+                    legendPosition: "middle",
+                    legendOffset: 40,
+                  }}
+                  axisLeft={{
+                    legend: "Hours",
+                    legendPosition: "middle",
+                    legendOffset: -45,
+                  }}
+                  tooltip={({ indexValue, value }) => (
+                    <div className="bg-gray-900 text-gray-100 text-sm p-2 rounded shadow-md border border-gray-700">
+                      <strong>{indexValue}</strong>: {value} hrs
+                    </div>
+                  )}
+                  animate={true}
+                  motionConfig="gentle"
+                />
               </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center">
+                No data available
+              </p>
             )}
-            animate={true}
-            motionConfig="wobbly"
-          />
+          </div>
+
+          {/* Pie Chart */}
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
+            <h3 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+              <FiCheckCircle className="text-green-400" /> Task Status Breakdown
+            </h3>
+            <div style={{ height: 300 }}>
+              <ResponsivePie
+                data={taskStatusData}
+                margin={{ top: 30, right: 40, bottom: 40, left: 40 }}
+                innerRadius={0.6}
+                padAngle={2}
+                cornerRadius={4}
+                colors={{ datum: "data.color" }}
+                borderWidth={2}
+                borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
+                arcLinkLabelsSkipAngle={10}
+                arcLinkLabelsTextColor="#d1d5db"
+                arcLabelsSkipAngle={10}
+                arcLabelsTextColor={{
+                  from: "color",
+                  modifiers: [["darker", 2]],
+                }}
+                theme={{
+                  textColor: "#d1d5db",
+                  tooltip: {
+                    container: { background: "#111827", color: "#f9fafb" },
+                  },
+                }}
+                tooltip={({ datum }) => (
+                  <div className="bg-gray-900 text-gray-100 text-sm p-2 rounded shadow-md border border-gray-700">
+                    <strong>{datum.id}</strong>: {datum.value}
+                  </div>
+                )}
+                animate={true}
+                motionConfig="wobbly"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ================= RECENT TASKS ================= */}
+        <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
+          <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+            <FiFolder className="text-purple-400" /> Recent Tasks
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-sm text-gray-300">
+              <thead className="bg-gray-800 text-xs uppercase text-gray-400">
+                <tr>
+                  <th className="py-3 px-4 text-left">Project</th>
+                  <th className="py-3 px-4 text-left">Task</th>
+                  <th className="py-3 px-4 text-left">Status</th>
+                  <th className="py-3 px-4 text-left">Time Spent</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tracking.slice(0, 5).map((t, i) => (
+                  <tr
+                    key={i}
+                    className="border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition"
+                  >
+                    <td className="py-3 px-4 text-gray-400">
+                      {t.task.project?.name || "—"}
+                    </td>
+                    <td className="py-3 px-4 font-medium text-gray-100">
+                      {t.task.title}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          t.status === "done"
+                            ? "bg-green-900/40 text-green-400"
+                            : t.status === "inprogress"
+                            ? "bg-amber-900/40 text-amber-400"
+                            : "bg-gray-800 text-gray-400"
+                        }`}
+                      >
+                        {t.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 font-semibold text-gray-200">
+                      {formatTime(t.timeSpent)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-
-    {/* ================= RECENT TASKS ================= */}
-    <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 shadow-sm backdrop-blur-sm">
-      <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-        <FiFolder className="text-purple-400" /> Recent Tasks
-      </h3>
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-gray-300">
-          <thead className="bg-gray-800 text-xs uppercase text-gray-400">
-            <tr>
-              <th className="py-3 px-4 text-left">Project</th>
-              <th className="py-3 px-4 text-left">Task</th>
-              <th className="py-3 px-4 text-left">Status</th>
-              <th className="py-3 px-4 text-left">Time Spent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tracking.slice(0, 5).map((t, i) => (
-              <tr
-                key={i}
-                className="border-b border-gray-800 last:border-0 hover:bg-gray-800/50 transition"
-              >
-                <td className="py-3 px-4 text-gray-400">
-                  {t.task.project?.name || "—"}
-                </td>
-                <td className="py-3 px-4 font-medium text-gray-100">
-                  {t.task.title}
-                </td>
-                <td className="py-3 px-4">
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      t.status === "done"
-                        ? "bg-green-900/40 text-green-400"
-                        : t.status === "inprogress"
-                        ? "bg-amber-900/40 text-amber-400"
-                        : "bg-gray-800 text-gray-400"
-                    }`}
-                  >
-                    {t.status}
-                  </span>
-                </td>
-                <td className="py-3 px-4 font-semibold text-gray-200">
-                  {formatTime(t.timeSpent)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
   );
 }
