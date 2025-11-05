@@ -37,6 +37,7 @@ import EmployeeCalendar from "./PM/EmployeeCalender";
 import EmployeeTimeTracking from "./PM/EmployeeTimeTracking";
 import EmployeePerformance from "./PM/EmployeePerformance";
 import EmployeeFiles from "./PM/EmployeeFiles";
+import Employee from "./HRMS/Employee";
 
 const App = () => {
   return (
@@ -78,6 +79,10 @@ const App = () => {
                 <Route path="/employee/time-tracking" element={<EmployeeTimeTracking />} />
                 <Route path="/employee/performance" element={<EmployeePerformance />} />
                 <Route path="/employee/files" element={<EmployeeFiles />} />
+
+
+{/* hr routes */}
+        <Route path="/hr/employees" element={<Employee />} />
 
 
 
